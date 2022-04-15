@@ -12,6 +12,17 @@ void Test() {
         int* deletion_counter_ptr = nullptr;
     };
 
+    {
+        SingleLinkedList<int> non_empty_list{1, 2, 3, 4};
+        // Копирование непустого списка
+        {
+            auto list_copy(non_empty_list);
+
+            assert(non_empty_list.begin() != list_copy.begin());
+            assert(list_copy == non_empty_list);
+        }
+    }
+
     // Проверка PopFront
     {
         SingleLinkedList<int> numbers{3, 14, 15, 92, 6};

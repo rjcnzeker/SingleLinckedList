@@ -85,6 +85,7 @@ class SingleLinkedList {
         // Возвращает ссылку на самого себя
         // Инкремент итератора, не указывающего на существующий элемент списка, приводит к неопределённому поведению
         BasicIterator& operator++() noexcept {
+            assert(node_ != nullptr);
             node_ = node_->next_node;
             return *this;
         }
@@ -103,6 +104,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] reference operator*() const noexcept {
+            assert(node_ != nullptr);
             return node_->value;
         }
 
@@ -110,6 +112,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] pointer operator->() const noexcept {
+            assert(node_ != nullptr);
             return &node_->value;
         }
 
@@ -140,12 +143,10 @@ public:
         assert(size_ == 0 && head_.next_node == nullptr);
 
         SingleLinkedList<Type> tmp;
-        std::deque<Type> tmp_values = {};
-        for (const Type& node : other) {
-            tmp_values.push_front(node);
-        }
-        for (const Type& value : tmp_values) {
-            tmp.PushFront(value);
+        Iterator tmp_last_pos = tmp.before_begin();
+        for (Type node : other) {
+            tmp.InsertAfter(tmp_last_pos, node);
+            ++tmp_last_pos;
         }
 
         swap(tmp);
@@ -247,12 +248,17 @@ public:
 
     // Обменивает содержимое списков за время O(1)
     void swap(SingleLinkedList& other) noexcept {
-        Node this_head = head_;
+       /* Node this_head = head_;
         int this_size = size_;
+
         head_.next_node = other.head_.next_node;
         size_ = other.size_;
+
         other.head_.next_node = this_head.next_node;
-        other.size_ = this_size;
+        other.size_ = this_size;*/
+
+        std::swap(head_, other.head_);
+        std::swap(size_, other.size_);
     }
 
     // Вставляет элемент value в начало списка за время O(1)
@@ -262,6 +268,7 @@ public:
     }
 
     void PopFront() noexcept {
+        assert(head_.next_node != nullptr);
         Node* deleted_node = head_.next_node;
         head_.next_node = head_.next_node->next_node;
         delete deleted_node;
@@ -274,6 +281,7 @@ public:
      * Если при создании элемента будет выброшено исключение, список останется в прежнем состоянии
      */
     Iterator InsertAfter(ConstIterator pos, const Type& value) {
+        assert(pos.node_ != nullptr);
         Node* insert_node = new Node(value, pos.node_->next_node);
         pos.node_->next_node = insert_node;
         ++size_;
@@ -285,6 +293,7 @@ public:
      * Возвращает итератор на элемент, следующий за удалённым
      */
     Iterator EraseAfter(ConstIterator pos) noexcept {
+        assert(pos.node_ != nullptr);
         Node* deletet_node = pos.node_->next_node;
         pos.node_->next_node = pos.node_->next_node->next_node;
         delete deletet_node;
